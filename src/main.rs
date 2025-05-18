@@ -19,6 +19,25 @@ pub fn plot_component() -> Html {
             .mode(plotly::common::Mode::Markers); // Display points as dots
         plot.add_trace(trace);
 
+
+        // Define the slope (m) and intercept (b)
+        let x_min = 0.0;
+        let x_max = 10.0;
+        let m = 2.0; // slope
+        let b = 1.0; // intercept
+
+        // Use the x-range of your scatterplot to calculate the line points
+        let x_line = vec![x_min, x_max];
+        let y_line = vec![m * x_min + b, m * x_max + b];
+
+        // Create a Scatter trace for the line
+        let line_trace = Scatter::new(x_line, y_line)
+            .mode(plotly::common::Mode::Lines)
+            .name("Line");
+
+        plot.add_trace(line_trace);
+
+
         let layout = plotly::Layout::new().title("Displaying a Chart in Yew");
         plot.set_layout(layout);
 
