@@ -1,0 +1,5 @@
+/target
+
+# Ignore Trunk build artifacts
+dist/*.js
+dist/*.wasm
