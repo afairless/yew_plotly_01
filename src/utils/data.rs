@@ -1,6 +1,5 @@
 use rand::prelude::*;
 use rand::distributions::Uniform;
-use rand_distr::Normal;
 
 pub struct Line {
     pub slope: f64,
@@ -19,25 +18,40 @@ pub fn generate_data_points(
     num_points: usize,
     seed: u64,
     x_range: (f64, f64),
-    y_mean: f64,
-    y_stddev: f64,
+    y_range: (f64, f64),
+    correlation: f64,
 ) -> (Vec<f64>, Vec<f64>) {
+
+    assert!((-1.0..=1.0).contains(&correlation), "Correlation must be between -1 and 1");
+
     let mut rng = StdRng::seed_from_u64(seed);
 
-    // Uniform distribution for x-axis
+    // Uniform distributions for x and y
     let x_dist = Uniform::new(x_range.0, x_range.1);
+    let y_dist = Uniform::new(y_range.0, y_range.1);
 
-    // Normal distribution for y-axis
-    let y_dist = Normal::new(y_mean, y_stddev).unwrap();
+    // Generate uncorrelated x and y values
+    let mut x_values: Vec<f64> = (0..num_points).map(|_| rng.sample(&x_dist)).collect();
+    let mut y_uncorrelated: Vec<f64> = (0..num_points).map(|_| rng.sample(&y_dist)).collect();
+
+    // Apply correlation transformation
+    let sqrt_term = (1.0 - correlation.powi(2)).sqrt();
+    let y_values: Vec<f64> = x_values
+        .iter()
+        .zip(y_uncorrelated.iter())
+        .map(|(&x, &y_uncorr)| correlation * x + sqrt_term * y_uncorr)
+        .collect();
+
+    (x_values, y_values)
 
     // Generate data points
-    (0..num_points)
-        .map(|_| {
-            let x = rng.sample(x_dist);
-            let y = rng.sample(y_dist);
-            (x, y)
-        })
-        .unzip()
+    //(0..num_points)
+    //    .map(|_| {
+    //        let x = rng.sample(x_dist);
+    //        let y = rng.sample(y_dist);
+    //        (x, y)
+    //    })
+    //    .unzip()
 }
 
 pub fn get_line_slopes_and_intercepts() -> Vec<Line> {

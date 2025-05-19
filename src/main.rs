@@ -13,7 +13,7 @@ pub fn plot_component() -> Html {
 
     let p1 = use_async::<_, _, ()>({
         let id = "plot1";
-        let (plot, line_traces) = plot::create_plot();
+        let (plot, line_traces) = plot::create_scatterplot();
         // Wrap plot in Rc<RefCell<>> for shared ownership
         let plot = Rc::new(RefCell::new(plot)); 
 
@@ -55,7 +55,7 @@ pub fn plot_component() -> Html {
 
     let p2 = use_async::<_, _, ()>({
         let id = "plot2";
-        let (plot, line_traces) = plot::create_plot();
+        let (plot, line_traces) = plot::create_scatterplot();
         // Wrap plot in Rc<RefCell<>> for shared ownership
         let plot = Rc::new(RefCell::new(plot)); 
 

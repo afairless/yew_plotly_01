@@ -10,13 +10,16 @@ fn color_to_rgb(color: &str) -> (u8, u8, u8) {
     }
 }
 
-pub fn create_plot() -> (Plot, Vec<Box<Scatter<f64, f64>>>) {
+pub fn create_scatterplot() -> (Plot, Vec<Box<Scatter<f64, f64>>>) {
 
     // Generate data points
     let x_min = 0.0;
     let x_max = 10.0;
+    let y_min = x_min;
+    let y_max = x_max;
+    let corr = 0.99;
     let (x_values, y_values) = generate_data_points(
-        100, 42, (x_min, x_max), 5.0, 2.0);
+        100, 42, (x_min, x_max), (y_min, y_max), corr);
 
     // Create a scatter trace with the generated data
     let trace = Scatter::new(x_values, y_values)
