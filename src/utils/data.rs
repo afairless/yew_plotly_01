@@ -15,16 +15,13 @@ pub struct Line {
 /// - `x_range`: The range for the x-axis values (min, max).
 /// - `y_mean`: The mean for the y-axis values (Normal distribution).
 /// - `y_stddev`: The standard deviation for the y-axis values (Normal distribution).
-///
-/// # Returns
-/// A vector of tuples representing the (x, y) coordinates of the data points.
 pub fn generate_data_points(
     num_points: usize,
     seed: u64,
     x_range: (f64, f64),
     y_mean: f64,
     y_stddev: f64,
-) -> Vec<(f64, f64)> {
+) -> (Vec<f64>, Vec<f64>) {
     let mut rng = StdRng::seed_from_u64(seed);
 
     // Uniform distribution for x-axis
@@ -40,7 +37,7 @@ pub fn generate_data_points(
             let y = rng.sample(y_dist);
             (x, y)
         })
-        .collect()
+        .unzip()
 }
 
 pub fn get_line_slopes_and_intercepts() -> Vec<Line> {

@@ -12,8 +12,8 @@ pub fn plot_component() -> Html {
         // Generate data points
         let x_min = 0.0;
         let x_max = 10.0;
-        let data = generate_data_points(100, 42, (x_min, x_max), 5.0, 2.0);
-        let (x_values, y_values): (Vec<f64>, Vec<f64>) = data.into_iter().unzip();
+        let (x_values, y_values) = generate_data_points(
+            100, 42, (x_min, x_max), 5.0, 2.0);
 
         // Create a scatter trace with the generated data
         let trace = Scatter::new(x_values, y_values)
@@ -24,10 +24,8 @@ pub fn plot_component() -> Html {
         let x_line = vec![x_min, x_max];
         let lines = get_line_slopes_and_intercepts();
 
-        // for (i, (m, b)) in lines.iter().enumerate() {
         for (i, line) in lines.iter().enumerate() {
             // Calculate y-values for the line
-            // let y_line = vec![m * x_min + b, m * x_max + b];
             let y_line = vec![
                 line.slope * x_min + line.intercept, 
                 line.slope * x_max + line.intercept];
@@ -42,7 +40,7 @@ pub fn plot_component() -> Html {
             // Create a Scatter trace for the line
             let line_trace = Scatter::new(x_line.clone(), y_line)
                 .mode(plotly::common::Mode::Lines)
-                .name(format!("Line {}", i + 1)) // Optional: Add a name for the legend
+                .name(format!("Line {}", i + 1)) // Optional: Add name for legend
                 .line(plotly::common::Line::new().color(color));
 
             plot.add_trace(line_trace);
