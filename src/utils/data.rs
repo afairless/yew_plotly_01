@@ -12,8 +12,7 @@ pub struct Line {
 /// - `num_points`: The number of data points to generate.
 /// - `seed`: The random seed for reproducibility.
 /// - `x_range`: The range for the x-axis values (min, max).
-/// - `y_mean`: The mean for the y-axis values (Normal distribution).
-/// - `y_stddev`: The standard deviation for the y-axis values (Normal distribution).
+/// - `y_range`: The range for the y-axis values (min, max).
 pub fn generate_data_points(
     num_points: usize,
     seed: u64,
@@ -43,24 +42,25 @@ pub fn generate_data_points(
         .collect();
 
     (x_values, y_values)
-
-    // Generate data points
-    //(0..num_points)
-    //    .map(|_| {
-    //        let x = rng.sample(x_dist);
-    //        let y = rng.sample(y_dist);
-    //        (x, y)
-    //    })
-    //    .unzip()
 }
 
-pub fn get_line_slopes_and_intercepts() -> Vec<Line> {
-   vec![
-       Line { slope: 1.0, intercept: 0.0, },
-       Line { slope: 0.5, intercept: 2.0, },
-       Line { slope: -0.5, intercept: 5.0, },
-       Line { slope: 1.5, intercept: 1.0, },
-   ]
+pub fn get_line_slopes_and_intercepts(
+    slope_range: (f64, f64),
+    intercept_range: (f64, f64),
+    num_lines: usize,
+    seed: u64,
+) -> Vec<Line> {
+    let mut rng = StdRng::seed_from_u64(seed);
+
+    let slope_dist = Uniform::new(slope_range.0, slope_range.1);
+    let intercept_dist = Uniform::new(intercept_range.0, intercept_range.1);
+
+    (0..num_lines)
+        .map(|_| Line {
+            slope: rng.sample(&slope_dist),
+            intercept: rng.sample(&intercept_dist),
+        })
+        .collect()
 }
 
 

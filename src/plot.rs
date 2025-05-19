@@ -17,9 +17,9 @@ pub fn create_scatterplot() -> (Plot, Vec<Box<Scatter<f64, f64>>>) {
     let x_max = 10.0;
     let y_min = x_min;
     let y_max = x_max;
-    let corr = 0.99;
+    let corr = 0.90;
     let (x_values, y_values) = generate_data_points(
-        100, 42, (x_min, x_max), (y_min, y_max), corr);
+        100, 2981328, (x_min, x_max), (y_min, y_max), corr);
 
     // Create a scatter trace with the generated data
     let trace = Scatter::new(x_values, y_values)
@@ -33,7 +33,14 @@ pub fn create_scatterplot() -> (Plot, Vec<Box<Scatter<f64, f64>>>) {
     plot.set_layout(plotly::Layout::new().show_legend(false).auto_size(true));
 
     let x_line = vec![x_min, x_max];
-    let lines = get_line_slopes_and_intercepts();
+    let slope_min = -10.0;
+    let slope_max = 10.0;
+    let intercept_min = -10.0;
+    let intercept_max = 10.0;
+    let num_lines = 5;
+    let lines = get_line_slopes_and_intercepts(
+        (slope_min, slope_max), (intercept_min, intercept_max), num_lines,
+        604913);
 
     let line_traces: Vec<Box<Scatter<f64, f64>>> = lines
         .iter()
