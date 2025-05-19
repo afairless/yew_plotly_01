@@ -1,6 +1,7 @@
 use rand::prelude::*;
 use rand::distributions::Uniform;
 
+#[derive(PartialEq, Debug)]
 pub struct Line {
     pub slope: f64,
     pub intercept: f64,
@@ -125,5 +126,36 @@ mod tests {
         let calculated_correlation = calculate_correlation(&x, &y);
         assert!((calculated_correlation - correlation).abs() < 0.1, 
             "Expected correlation: {}, but got: {}", correlation, calculated_correlation);
+    }
+
+    #[test]
+    fn test_get_line_slopes_and_intercepts_correct_length() {
+        let num_lines = 10;
+        let lines = get_line_slopes_and_intercepts((0.0, 1.0), (0.0, 1.0), num_lines, 42);
+        assert_eq!(lines.len(), num_lines);
+    }
+
+    #[test]
+    fn test_get_line_slopes_and_intercepts_within_range() {
+        let slope_range = (-1.0, 1.0);
+        let intercept_range = (0.0, 5.0);
+        let num_lines = 100;
+        let lines = get_line_slopes_and_intercepts(slope_range, intercept_range, num_lines, 42);
+
+        assert!(lines.iter().all(|line| line.slope >= slope_range.0 && line.slope <= slope_range.1));
+        assert!(lines.iter().all(|line| line.intercept >= intercept_range.0 && line.intercept <= intercept_range.1));
+    }
+
+    #[test]
+    fn test_get_line_slopes_and_intercepts_deterministic() {
+        let slope_range = (0.0, 10.0);
+        let intercept_range = (0.0, 10.0);
+        let num_lines = 5;
+        let seed = 42;
+
+        let lines1 = get_line_slopes_and_intercepts(slope_range, intercept_range, num_lines, seed);
+        let lines2 = get_line_slopes_and_intercepts(slope_range, intercept_range, num_lines, seed);
+
+        assert_eq!(lines1, lines2, "The function should produce the same output for the same seed");
     }
 }

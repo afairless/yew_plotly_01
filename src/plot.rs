@@ -13,7 +13,7 @@ fn color_to_rgb(color: &str) -> (u8, u8, u8) {
 pub fn create_scatterplot() -> (Plot, Vec<Box<Scatter<f64, f64>>>) {
 
     // Generate data points
-    let x_min = 0.0;
+    let x_min = -10.0;
     let x_max = 10.0;
     let y_min = x_min;
     let y_max = x_max;
