@@ -13,7 +13,7 @@ use rand_distr::Normal;
 ///
 /// # Returns
 /// A vector of tuples representing the (x, y) coordinates of the data points.
-pub fn generate_data(
+pub fn generate_data_points(
     num_points: usize,
     seed: u64,
     x_range: (f64, f64),
@@ -38,3 +38,14 @@ pub fn generate_data(
         .collect()
 }
 
+/// Returns a vector of lines defined by their slope and intercept.
+///
+/// Each line is represented as a tuple `(slope, intercept)`.
+pub fn get_line_slopes_and_intercepts() -> Vec<(f64, f64)> {
+    vec![
+        (1.0, 0.0),  // Line 1: slope = 1.0, intercept = 0.0
+        (0.5, 2.0),  // Line 2: slope = 0.5, intercept = 2.0
+        (-0.5, 5.0), // Line 3: slope = -0.5, intercept = 5.0
+        (1.5, 1.0),  // Last line: slope = 2.0, intercept = 1.0
+    ]
+}
