@@ -1,5 +1,6 @@
 /target
 
 # Ignore Trunk build artifacts
+dist/*.html
 dist/*.js
 dist/*.wasm

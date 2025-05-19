@@ -24,9 +24,13 @@ pub fn plot_component() -> Html {
         let x_line = vec![x_min, x_max];
         let lines = get_line_slopes_and_intercepts();
 
-        for (i, (m, b)) in lines.iter().enumerate() {
+        // for (i, (m, b)) in lines.iter().enumerate() {
+        for (i, line) in lines.iter().enumerate() {
             // Calculate y-values for the line
-            let y_line = vec![m * x_min + b, m * x_max + b];
+            // let y_line = vec![m * x_min + b, m * x_max + b];
+            let y_line = vec![
+                line.slope * x_min + line.intercept, 
+                line.slope * x_max + line.intercept];
 
             // Set color and alpha based on the line index
             let color = if i < lines.len() - 1 {
