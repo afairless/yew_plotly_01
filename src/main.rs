@@ -100,12 +100,10 @@ pub fn plot_component() -> Html {
         p2.run();
     });
 
-    // html! {
-    //  <div id="plot-div"></div>
     html! {
-        <div style="display: flex; justify-content: space-around;">
-            <div id="plot1" style="width: 50%;"></div>
-            <div id="plot2" style="width: 50%;"></div>
+        <div style="display: flex; justify-content: space-around; width: 100%; height: 100%;">
+            <div id="plot1" style="flex-grow: 1; min-width: 300px; height: 100%;"></div>
+            <div id="plot2" style="flex-grow: 1; min-width: 300px; height: 100%;"></div>
         </div>
     }
 }

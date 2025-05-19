@@ -27,7 +27,7 @@ pub fn create_plot() -> (Plot, Vec<Box<Scatter<f64, f64>>>) {
     plot.add_trace(trace);
 
     // Disable the legend
-    plot.set_layout(plotly::Layout::new().show_legend(false));
+    plot.set_layout(plotly::Layout::new().show_legend(false).auto_size(true));
 
     let x_line = vec![x_min, x_max];
     let lines = get_line_slopes_and_intercepts();
