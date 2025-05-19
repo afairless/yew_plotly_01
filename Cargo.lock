@@ -1838,6 +1838,8 @@ dependencies = [
  "plotly",
  "rand",
  "rand_distr",
+ "wasm-bindgen",
+ "wasm-bindgen-futures",
  "wasm-logger",
  "web-sys",
  "yew",
