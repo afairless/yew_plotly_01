@@ -41,10 +41,10 @@ pub fn generate_data_points(
 }
 
 pub fn get_line_slopes_and_intercepts() -> Vec<Line> {
-    vec![
-        Line { slope: 1.0, intercept: 0.0 },
-        Line { slope: 0.5, intercept: 2.0 },
-        Line { slope: -0.5, intercept: 5.0 },
-        Line { slope: 1.5, intercept: 1.0 },
-    ]
+   vec![
+       Line { slope: 1.0, intercept: 0.0, },
+       Line { slope: 0.5, intercept: 2.0, },
+       Line { slope: -0.5, intercept: 5.0, },
+       Line { slope: 1.5, intercept: 1.0, },
+   ]
 }
