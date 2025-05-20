@@ -64,6 +64,26 @@ pub fn get_line_slopes_and_intercepts(
         .collect()
 }
 
+pub fn calculate_mean_squared_error(
+    x_values: &[f64], 
+    y_values: &[f64], 
+    line: &Line) -> f64 {
+
+    assert_eq!(x_values.len(), y_values.len(), "x_values and y_values must have the same length");
+
+    let n = x_values.len() as f64;
+
+    let mse: f64 = x_values
+        .iter()
+        .zip(y_values.iter())
+        .map(|(&x, &y)| {
+            let predicted_y = line.slope * x + line.intercept;
+            (y - predicted_y).powi(2)
+        })
+        .sum();
+
+    mse / n
+}
 
 #[cfg(test)]
 mod tests {
@@ -157,5 +177,55 @@ mod tests {
         let lines2 = get_line_slopes_and_intercepts(slope_range, intercept_range, num_lines, seed);
 
         assert_eq!(lines1, lines2, "The function should produce the same output for the same seed");
+    }
+
+    #[test]
+    fn test_calculate_mean_squared_error_perfect_fit() {
+        let x_values = vec![1.0, 2.0, 3.0];
+        let y_values = vec![2.0, 4.0, 6.0];
+        let line = Line { slope: 2.0, intercept: 0.0 };
+
+        let mse = calculate_mean_squared_error(&x_values, &y_values, &line);
+        assert_eq!(mse, 0.0, "MSE should be 0 for a perfect fit");
+    }
+
+    #[test]
+    fn test_calculate_mean_squared_error_nonzero_error() {
+        let x_values = vec![1.0, 2.0, 3.0];
+        let y_values = vec![2.0, 4.0, 6.0];
+        let line = Line { slope: 1.5, intercept: 0.5 };
+
+        let mse = calculate_mean_squared_error(&x_values, &y_values, &line);
+        assert!(mse > 0.0, "MSE should be greater than 0 for a non-perfect fit");
+    }
+
+    #[test]
+    fn test_calculate_mean_squared_error_with_negative_slope() {
+        let x_values = vec![1.0, 2.0, 3.0];
+        let y_values = vec![2.0, 4.0, 6.0];
+        let line = Line { slope: -1.0, intercept: 10.0 };
+
+        let mse = calculate_mean_squared_error(&x_values, &y_values, &line);
+        assert!(mse > 0.0, "MSE should be greater than 0 for a line with a negative slope");
+    }
+
+    #[test]
+    fn test_calculate_mean_squared_error_empty_values() {
+        let x_values: Vec<f64> = vec![];
+        let y_values: Vec<f64> = vec![];
+        let line = Line { slope: 1.0, intercept: 0.0 };
+
+        let mse = calculate_mean_squared_error(&x_values, &y_values, &line);
+        assert!(mse.is_nan(), "MSE should be NaN for empty input values");
+    }
+
+    #[test]
+    #[should_panic(expected = "x_values and y_values must have the same length")]
+    fn test_calculate_mean_squared_error_mismatched_lengths() {
+        let x_values = vec![1.0, 2.0];
+        let y_values = vec![2.0, 4.0, 6.0];
+        let line = Line { slope: 1.0, intercept: 0.0 };
+
+        calculate_mean_squared_error(&x_values, &y_values, &line);
     }
 }
