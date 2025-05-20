@@ -5,9 +5,11 @@ use yew::prelude::*;
 use yew_hooks::use_async;
 use std::rc::Rc;
 use std::cell::RefCell;
+use plotly::{Plot, Scatter};
 mod utils;
 mod plot;
 use crate::plot::{generate_scatter_data, generate_lines};
+use crate::utils::data::calculate_mean_squared_error;
 
 #[function_component(App)]
 pub fn plot_component() -> Html {
@@ -62,29 +64,57 @@ pub fn plot_component() -> Html {
 
     let p2 = use_async::<_, _, ()>({
         let id = "plot2";
-        let (plot, line_traces) = plot::create_scatterplot(
-            x_min, x_max, x_values.clone(), y_values.clone(), lines.clone());
-        // Wrap plot in Rc<RefCell<>> for shared ownership
-        let plot = Rc::new(RefCell::new(plot)); 
+
+        // Calculate the MSE for each line
+        let mse_values: Vec<f64> = lines
+            .iter()
+            .map(|line| calculate_mean_squared_error(&x_values, &y_values, line))
+            .collect();
+        let indices: Vec<usize> = (0..mse_values.len()).collect();
+
+        // Create an empty scatterplot
+        let plot = Plot::new();
+        let x_data: Vec<usize> = Vec::new();
+        let y_data: Vec<f64> = Vec::new();
+
+        let plot = Rc::new(RefCell::new(plot));
+        let x_data = Rc::new(RefCell::new(x_data));
+        let y_data = Rc::new(RefCell::new(y_data));
 
         async move {
             // Borrow the inner Plot
             plotly::bindings::new_plot(id, &*plot.borrow()).await; 
 
-            // Animate the lines
-            for (i, trace) in line_traces.into_iter().enumerate() {
+            // Animate the points
+            for (i, mse) in mse_values.iter().enumerate() {
                 let delay = i as u32 * 1000; // 1 second per animation step
                 let window = window().unwrap();
                 let id = id.to_string();
-                let plot = Rc::clone(&plot); // Clone Rc for the closure
+                let plot = Rc::clone(&plot);
+                let x_data = Rc::clone(&x_data);
+                let y_data = Rc::clone(&y_data);
+                let x = indices[i];
+                let y = *mse;
+
                 let closure = Closure::wrap(Box::new(move || {
                     let id = id.clone();
-                    let trace = trace.clone();
                     let plot = Rc::clone(&plot); // Clone Rc for plot
+                    let x_data = Rc::clone(&x_data);
+                    let y_data = Rc::clone(&y_data);
                     spawn_local(async move {
-                        // Borrow mutably for add_trace
-                        let mut plot = plot.borrow_mut(); 
-                        plot.add_trace(Box::new(*trace));
+                        // Update the x and y data
+                        x_data.borrow_mut().push(x);
+                        y_data.borrow_mut().push(y);
+
+                        // Create a new scatter trace with the updated data
+                        let scatter = Scatter::new(x_data.borrow().clone(), y_data.borrow().clone())
+                            .mode(plotly::common::Mode::Markers)
+                            .name("MSE Values");
+
+                        // Re-render the plot
+                        let mut plot = plot.borrow_mut();
+                        *plot = Plot::new(); // Reset the plot
+                        plot.add_trace(scatter); // Add the updated trace
                         plotly::bindings::react(&id, &plot).await;
                     });
                 }) as Box<dyn Fn()>);
