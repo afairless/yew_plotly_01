@@ -7,13 +7,20 @@ use std::rc::Rc;
 use std::cell::RefCell;
 mod utils;
 mod plot;
+use crate::plot::{generate_scatter_data, generate_lines};
 
 #[function_component(App)]
 pub fn plot_component() -> Html {
 
+    let x_min = -10.0;
+    let x_max = 10.0;
+    let (x_values, y_values) = generate_scatter_data(x_min, x_max);
+    let lines = generate_lines();
+
     let p1 = use_async::<_, _, ()>({
         let id = "plot1";
-        let (plot, line_traces) = plot::create_scatterplot();
+        let (plot, line_traces) = plot::create_scatterplot(
+            x_min, x_max, x_values.clone(), y_values.clone(), lines.clone());
         // Wrap plot in Rc<RefCell<>> for shared ownership
         let plot = Rc::new(RefCell::new(plot)); 
 
@@ -55,7 +62,8 @@ pub fn plot_component() -> Html {
 
     let p2 = use_async::<_, _, ()>({
         let id = "plot2";
-        let (plot, line_traces) = plot::create_scatterplot();
+        let (plot, line_traces) = plot::create_scatterplot(
+            x_min, x_max, x_values.clone(), y_values.clone(), lines.clone());
         // Wrap plot in Rc<RefCell<>> for shared ownership
         let plot = Rc::new(RefCell::new(plot)); 
 

@@ -1,7 +1,7 @@
 use rand::prelude::*;
 use rand::distributions::Uniform;
 
-#[derive(PartialEq, Debug)]
+#[derive(PartialEq, Debug, Clone)]
 pub struct Line {
     pub slope: f64,
     pub intercept: f64,
