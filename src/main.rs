@@ -72,8 +72,20 @@ pub fn plot_component() -> Html {
             .collect();
         let indices: Vec<usize> = (0..mse_values.len()).collect();
 
+        // Calculate axes limits
+        let x_min = -0.3;
+        let x_max_raw = indices.len() as f64;
+        let x_padding = 0.3;
+        let x_max = x_max_raw + x_padding;
+
+        let y_min = 0.0;
+        // let y_min = mse_values.iter().cloned().fold(f64::INFINITY, f64::min);
+        let y_max_raw = mse_values.iter().cloned().fold(f64::NEG_INFINITY, f64::max);
+        let y_padding = (y_max_raw - y_min) * 0.05; // Add 5% padding
+        let y_max = y_max_raw + y_padding;
+
         // Use the new function to create the plot and data structures
-        let (plot, x_data, y_data) = plot::create_mse_plot(id);
+        let (plot, x_data, y_data) = plot::create_mse_plot(id, x_min, x_max, y_min, y_max);
 
         async move {
             // Animate the points
@@ -104,8 +116,10 @@ pub fn plot_component() -> Html {
 
                         // Re-render the plot
                         let mut plot = plot.borrow_mut();
+                        let layout = plot.layout().clone(); // Clone the existing layout
                         *plot = Plot::new(); // Reset the plot
                         plot.add_trace(scatter); // Add the updated trace
+                        plot.set_layout(layout); // Reapply the layout
                         plotly::bindings::react(&id, &plot).await;
                     });
                 }) as Box<dyn Fn()>);

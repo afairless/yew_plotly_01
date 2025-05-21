@@ -98,11 +98,24 @@ pub fn create_scatterplot(
 
 pub fn create_mse_plot(
     id: &str,
+    x_min: f64,
+    x_max: f64,
+    y_min: f64,
+    y_max: f64,
 ) -> (SharedPlot, SharedVec<usize>, SharedVec<f64>) {
     // Create an empty scatterplot
     let plot = Rc::new(RefCell::new(Plot::new()));
     let x_data = Rc::new(RefCell::new(Vec::new()));
     let y_data = Rc::new(RefCell::new(Vec::new()));
+
+    // Set the y-axis limits in the layout (x-axis will auto-scale)
+    let layout = plotly::Layout::new()
+        .x_axis(plotly::layout::Axis::new().range(vec![x_min, x_max]))
+        .y_axis(plotly::layout::Axis::new().range(vec![y_min, y_max]));
+    plot.borrow_mut().set_layout(layout);
+
+    // Log the layout for debugging
+    // web_sys::console::log_1(&format!("Setting y-axis range: [{}, {}]", y_min, y_max).into());
 
     // Initialize the plot asynchronously
     let plot_clone = Rc::clone(&plot);
