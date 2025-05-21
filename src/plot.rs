@@ -4,6 +4,9 @@ use std::cell::RefCell;
 use plotly::{Plot, Scatter};
 use crate::utils::data::{generate_data_points, get_line_slopes_and_intercepts, Line};
 
+// Type aliases for readability
+type SharedPlot = Rc<RefCell<Plot>>;
+type SharedVec<T> = Rc<RefCell<Vec<T>>>;
 
 fn color_to_rgb(color: &str) -> (u8, u8, u8) {
     match color {
@@ -95,7 +98,7 @@ pub fn create_scatterplot(
 
 pub fn create_mse_plot(
     id: &str,
-) -> (Rc<RefCell<Plot>>, Rc<RefCell<Vec<usize>>>, Rc<RefCell<Vec<f64>>>) {
+) -> (SharedPlot, SharedVec<usize>, SharedVec<f64>) {
     // Create an empty scatterplot
     let plot = Rc::new(RefCell::new(Plot::new()));
     let x_data = Rc::new(RefCell::new(Vec::new()));
