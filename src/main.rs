@@ -111,12 +111,12 @@ pub fn plot_component() -> Html {
 
                         // Create a new scatter trace with the updated data
                         let scatter = Scatter::new(x_data.borrow().clone(), y_data.borrow().clone())
-                            .mode(plotly::common::Mode::Markers)
+                            .mode(plotly::common::Mode::LinesMarkers) // Use Lines+Markers mode
                             .name("MSE Values");
 
                         // Re-render the plot
                         let mut plot = plot.borrow_mut();
-                        let layout = plot.layout().clone(); // Clone the existing layout
+                        let layout = plot.layout().clone();
                         *plot = Plot::new(); // Reset the plot
                         plot.add_trace(scatter); // Add the updated trace
                         plot.set_layout(layout); // Reapply the layout
