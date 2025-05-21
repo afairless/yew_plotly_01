@@ -1,3 +1,6 @@
+use wasm_bindgen_futures::spawn_local;
+use std::rc::Rc;
+use std::cell::RefCell;
 use plotly::{Plot, Scatter};
 use crate::utils::data::{generate_data_points, get_line_slopes_and_intercepts, Line};
 
@@ -88,4 +91,22 @@ pub fn create_scatterplot(
 
     (plot, line_traces)
 
+}
+
+pub fn create_mse_plot(
+    id: &str,
+) -> (Rc<RefCell<Plot>>, Rc<RefCell<Vec<usize>>>, Rc<RefCell<Vec<f64>>>) {
+    // Create an empty scatterplot
+    let plot = Rc::new(RefCell::new(Plot::new()));
+    let x_data = Rc::new(RefCell::new(Vec::new()));
+    let y_data = Rc::new(RefCell::new(Vec::new()));
+
+    // Initialize the plot asynchronously
+    let plot_clone = Rc::clone(&plot);
+    let id = id.to_string();
+    spawn_local(async move {
+        plotly::bindings::new_plot(&id, &*plot_clone.borrow()).await;
+    });
+
+    (plot, x_data, y_data)
 }

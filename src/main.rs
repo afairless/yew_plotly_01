@@ -72,19 +72,10 @@ pub fn plot_component() -> Html {
             .collect();
         let indices: Vec<usize> = (0..mse_values.len()).collect();
 
-        // Create an empty scatterplot
-        let plot = Plot::new();
-        let x_data: Vec<usize> = Vec::new();
-        let y_data: Vec<f64> = Vec::new();
-
-        let plot = Rc::new(RefCell::new(plot));
-        let x_data = Rc::new(RefCell::new(x_data));
-        let y_data = Rc::new(RefCell::new(y_data));
+        // Use the new function to create the plot and data structures
+        let (plot, x_data, y_data) = plot::create_mse_plot(id);
 
         async move {
-            // Borrow the inner Plot
-            plotly::bindings::new_plot(id, &*plot.borrow()).await; 
-
             // Animate the points
             for (i, mse) in mse_values.iter().enumerate() {
                 let delay = i as u32 * 1000; // 1 second per animation step
