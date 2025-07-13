@@ -54,15 +54,24 @@ pub fn create_scatterplot(
 ) ->(Plot, Vec<Box<Scatter<f64, f64>>>) {
 
     // Create a scatter trace with the generated data
-    let trace = Scatter::new(x_values, y_values)
+    let trace = Scatter::new(x_values, y_values.clone())
         .mode(plotly::common::Mode::Markers)
         .name("Data Points");
 
     let mut plot = Plot::new();
     plot.add_trace(trace);
 
+    let y_min = y_values.iter().cloned().fold(f64::INFINITY, f64::min);
+    let y_max = y_values.iter().cloned().fold(f64::NEG_INFINITY, f64::max);
+
+    plot.set_layout(
+        plotly::Layout::new()
+            .show_legend(false)
+            .auto_size(true)
+            .y_axis(plotly::layout::Axis::new().range(vec![1.5*y_min, 1.5*y_max]))
+    );
     // Disable the legend
-    plot.set_layout(plotly::Layout::new().show_legend(false).auto_size(true));
+    // plot.set_layout(plotly::Layout::new().show_legend(false).auto_size(true));
 
     let x_line = vec![x_min, x_max];
     // let lines = generate_lines();
