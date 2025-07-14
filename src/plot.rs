@@ -21,15 +21,15 @@ pub fn generate_scatter_data(
     x_max: f64,
 ) ->(Vec<f64>, Vec<f64>) {
 
-    let num_points = 100;
+    let num_points = 4000;
     let seed = 2981328;
-    let y_min = x_min;
-    let y_max = x_max;
     let x_range = (x_min, x_max);
-    let y_range = (y_min, y_max);
+    let x_coef = -0.9;
+    let y_intercept = 0.0;
+
     let correlation = 0.5;
 
-    generate_data_points(num_points, seed, x_range, y_range, correlation)
+    generate_data_points(num_points, seed, x_range, x_coef, y_intercept, correlation)
 }
 
 pub fn generate_lines() -> Vec<Line> {
@@ -56,6 +56,7 @@ pub fn create_scatterplot(
     // Create a scatter trace with the generated data
     let trace = Scatter::new(x_values, y_values.clone())
         .mode(plotly::common::Mode::Markers)
+        .marker(plotly::common::Marker::new().color("rgba(0, 0, 255, 0.05)"))
         .name("Data Points");
 
     let mut plot = Plot::new();

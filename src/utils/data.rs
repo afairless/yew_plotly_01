@@ -1,5 +1,6 @@
 use rand::prelude::*;
 use rand::distributions::Uniform;
+use rand_distr::Normal;
 
 #[derive(PartialEq, Debug, Clone)]
 pub struct Line {
@@ -18,7 +19,8 @@ pub fn generate_data_points(
     num_points: usize,
     seed: u64,
     x_range: (f64, f64),
-    y_range: (f64, f64),
+    x_coef: f64,
+    y_intercept: f64,
     correlation: f64,
 ) -> (Vec<f64>, Vec<f64>) {
 
@@ -26,20 +28,19 @@ pub fn generate_data_points(
 
     let mut rng = StdRng::seed_from_u64(seed);
 
-    // Uniform distributions for x and y
     let x_dist = Uniform::new(x_range.0, x_range.1);
-    let y_dist = Uniform::new(y_range.0, y_range.1);
+    let x_std = (x_range.1 - x_range.0) / 12.0_f64.sqrt();
 
-    // Generate uncorrelated x and y values
+    let y_std = (x_coef * x_std * (1.0 - correlation.powi(2)).sqrt()) / correlation;
+
+    let y_dist = Normal::new(0.0, y_std).unwrap();
+
+    let noise: Vec<f64> = (0..num_points).map(|_| y_dist.sample(&mut rng)).collect();
+
     let x_values: Vec<f64> = (0..num_points).map(|_| rng.sample(&x_dist)).collect();
-    let y_uncorrelated: Vec<f64> = (0..num_points).map(|_| rng.sample(&y_dist)).collect();
-
-    // Apply correlation transformation
-    let sqrt_term = (1.0 - correlation.powi(2)).sqrt();
-    let y_values: Vec<f64> = x_values
-        .iter()
-        .zip(y_uncorrelated.iter())
-        .map(|(&x, &y_uncorr)| correlation * x + sqrt_term * y_uncorr)
+    let y_values: Vec<f64> = x_values.iter()
+        .zip(noise.iter())
+        .map(|(&xi, &ei)| x_coef * xi + y_intercept + ei)
         .collect();
 
     (x_values, y_values)
@@ -109,7 +110,7 @@ mod tests {
     #[test]
     fn test_generate_data_points_correct_length() {
         let num_points = 1000;
-        let (x, y) = generate_data_points(num_points, 42, (0.0, 10.0), (0.0, 10.0), 0.5);
+        let (x, y) = generate_data_points(num_points, 11355, (0.0, 10.0), 0.5, 0.0, 0.5);
         assert_eq!(x.len(), num_points);
         assert_eq!(y.len(), num_points);
     }
@@ -118,8 +119,7 @@ mod tests {
     fn test_generate_data_points_within_range() {
         let num_points = 1000;
         let x_range = (0.0, 10.0);
-        let y_range = (5.0, 15.0);
-        let (x, _y) = generate_data_points(num_points, 42, x_range, y_range, 0.5);
+        let (x, _y) = generate_data_points(num_points, 11355, x_range, 0.5, 0.0, 0.5);
 
         assert!(x.iter().all(|&xi| xi >= x_range.0 && xi <= x_range.1));
         // after transformation, 'y' data points can exceed original range
@@ -130,22 +130,22 @@ mod tests {
     fn test_generate_data_points_correlation() {
         let num_points = 1000;
         let correlation = 0.8;
-        let (x, y) = generate_data_points(num_points, 42, (0.0, 10.0), (0.0, 10.0), correlation);
+        let (x, y) = generate_data_points(num_points, 11355, (0.0, 10.0), 0.5, 0.0, correlation);
 
         let calculated_correlation = calculate_correlation(&x, &y);
         assert!((calculated_correlation - correlation).abs() < 0.1, 
-            "Expected correlation: {}, but got: {}", correlation, calculated_correlation);
+            "Expected correlation: {correlation}, but got: {calculated_correlation}");
     }
 
     #[test]
     fn test_generate_data_points_negative_correlation() {
         let num_points = 1000;
         let correlation = -0.8;
-        let (x, y) = generate_data_points(num_points, 42, (0.0, 10.0), (0.0, 10.0), correlation);
+        let (x, y) = generate_data_points(num_points, 11355, (0.0, 10.0), -0.5, 0.0, correlation);
 
         let calculated_correlation = calculate_correlation(&x, &y);
         assert!((calculated_correlation - correlation).abs() < 0.1, 
-            "Expected correlation: {}, but got: {}", correlation, calculated_correlation);
+            "Expected correlation: {correlation}, but got: {calculated_correlation}");
     }
 
     #[test]
